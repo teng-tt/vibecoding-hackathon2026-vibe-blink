@@ -48,9 +48,9 @@ function getMetadata(mode: string, reqUrl: string): ActionGetResponse {
       links: {
         actions: [
           // 注意：我们在 href 后面加上了 queryStr，确保参数传递下去
-          { label: "1分", href: `${baseApi}?action=tx_rate&score=1${queryStr}` },
-          { label: "5分", href: `${baseApi}?action=tx_rate&score=5${queryStr}` },
-          { label: "🔙 返回", href: `${baseApi}?action=nav_menu${queryStr}` },
+          { type: "action", label: "1分", href: `${baseApi}?action=tx_rate&score=1${queryStr}` },
+          { type: "action", label: "5分", href: `${baseApi}?action=tx_rate&score=5${queryStr}` },
+          { type: "action", label: "🔙 返回", href: `${baseApi}?action=nav_menu${queryStr}` },
         ],
       },
     };
@@ -66,11 +66,12 @@ function getMetadata(mode: string, reqUrl: string): ActionGetResponse {
       links: {
         actions: [
           {
+            type: "action",
             label: "确认打赏",
             href: `${baseApi}?action=tx_tip&amount={amount}${queryStr}`,
             parameters: [{ name: "amount", label: "输入金额", required: true }],
           },
-          { label: "🔙 返回", href: `${baseApi}?action=nav_menu${queryStr}` },
+          { type: "action", label: "🔙 返回", href: `${baseApi}?action=nav_menu${queryStr}` },
         ],
       },
     };
@@ -85,9 +86,9 @@ function getMetadata(mode: string, reqUrl: string): ActionGetResponse {
       label: "Predict",
       links: {
         actions: [
-          { label: "看涨 (Yes)", href: `${baseApi}?action=tx_predict&side=yes${queryStr}` },
-          { label: "看跌 (No)", href: `${baseApi}?action=tx_predict&side=no${queryStr}` },
-          { label: "🔙 返回", href: `${baseApi}?action=nav_menu${queryStr}` },
+          { type: "action", label: "看涨 (Yes)", href: `${baseApi}?action=tx_predict&side=yes${queryStr}` },
+          { type: "action", label: "看跌 (No)", href: `${baseApi}?action=tx_predict&side=no${queryStr}` },
+          { type: "action", label: "🔙 返回", href: `${baseApi}?action=nav_menu${queryStr}` },
         ],
       },
     };
@@ -101,9 +102,9 @@ function getMetadata(mode: string, reqUrl: string): ActionGetResponse {
     label: "Menu",
     links: {
       actions: [
-        { label: "🌟 评分", href: `${baseApi}?action=nav_rate${queryStr}` },
-        { label: "💰 打赏", href: `${baseApi}?action=nav_tip${queryStr}` },
-        { label: "🎲 预测", href: `${baseApi}?action=nav_predict${queryStr}` },
+        { type: "action", label: "🌟 评分", href: `${baseApi}?action=nav_rate${queryStr}` },
+        { type: "action", label: "💰 打赏", href: `${baseApi}?action=nav_tip${queryStr}` },
+        { type: "action", label: "🎲 预测", href: `${baseApi}?action=nav_predict${queryStr}` },
       ],
     },
   };
