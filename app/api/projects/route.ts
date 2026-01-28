@@ -8,14 +8,14 @@ export async function GET(request: NextRequest) {
 
     if (id) {
       // 获取单个项目
-      const project = getProjectById(id);
+      const project = await getProjectById(id);
       if (!project) {
         return NextResponse.json({ error: "Project not found" }, { status: 404 });
       }
       return NextResponse.json(project);
     } else {
       // 获取所有项目
-      const projects = getAllProjects();
+      const projects = await getAllProjects();
       return NextResponse.json(projects);
     }
   } catch (error) {
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       txs: parseInt(body.txs) || 0,
     };
 
-    if (addProject(project)) {
+    if (await addProject(project)) {
       return NextResponse.json(project, { status: 201 });
     } else {
       return NextResponse.json({ error: "Failed to add project" }, { status: 400 });
@@ -58,8 +58,8 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: "Project ID is required" }, { status: 400 });
     }
 
-    if (updateProject(id, updates)) {
-      const project = getProjectById(id);
+    if (await updateProject(id, updates)) {
+      const project = await getProjectById(id);
       return NextResponse.json(project);
     } else {
       return NextResponse.json({ error: "Failed to update project" }, { status: 400 });
@@ -79,7 +79,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Project ID is required" }, { status: 400 });
     }
 
-    if (deleteProject(id)) {
+    if (await deleteProject(id)) {
       return NextResponse.json({ success: true });
     } else {
       return NextResponse.json({ error: "Failed to delete project" }, { status: 400 });

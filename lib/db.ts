@@ -1,43 +1,4 @@
-import Database from "better-sqlite3";
-import path from "path";
-
-// 获取数据库文件路径
-const dbPath = path.join(process.cwd(), "data", "projects.db");
-
-// 确保 data 目录存在
-import { mkdirSync } from "fs";
-mkdirSync(path.dirname(dbPath), { recursive: true });
-
-// 创建或打开数据库
-let db: Database.Database | null = null;
-
-export function getDb(): Database.Database {
-  if (!db) {
-    db = new Database(dbPath);
-    db.pragma("journal_mode = WAL");
-    initializeDatabase();
-  }
-  return db;
-}
-
-function initializeDatabase() {
-  const database = getDb();
-  
-  // 创建项目表
-  database.exec(`
-    CREATE TABLE IF NOT EXISTS projects (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      description TEXT,
-      wallet TEXT,
-      link TEXT,
-      volume REAL,
-      txs INTEGER,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-}
+import { sql } from "@vercel/postgres";
 
 export interface Project {
   id: string;
@@ -51,23 +12,36 @@ export interface Project {
   updated_at?: string;
 }
 
-export function addProject(project: Project): boolean {
-  const db = getDb();
-  const stmt = db.prepare(`
-    INSERT INTO projects (id, name, description, wallet, link, volume, txs)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-  `);
-  
+// 初始化数据库表
+export async function initializeDatabase() {
   try {
-    stmt.run(
-      project.id,
-      project.name,
-      project.description,
-      project.wallet,
-      project.link,
-      project.volume,
-      project.txs
-    );
+    // 创建项目表（如果不存在）
+    await sql`
+      CREATE TABLE IF NOT EXISTS projects (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        description TEXT,
+        wallet TEXT,
+        link TEXT,
+        volume NUMERIC,
+        txs INTEGER,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `;
+    console.log("Database initialized successfully");
+  } catch (error) {
+    console.error("Error initializing database:", error);
+    throw error;
+  }
+}
+
+export async function addProject(project: Project): Promise<boolean> {
+  try {
+    await sql`
+      INSERT INTO projects (id, name, description, wallet, link, volume, txs)
+      VALUES (${project.id}, ${project.name}, ${project.description}, ${project.wallet}, ${project.link}, ${project.volume}, ${project.txs})
+    `;
     return true;
   } catch (error) {
     console.error("Error adding project:", error);
@@ -75,32 +49,35 @@ export function addProject(project: Project): boolean {
   }
 }
 
-export function getAllProjects(): Project[] {
-  const db = getDb();
-  const stmt = db.prepare(`
-    SELECT * FROM projects ORDER BY created_at DESC
-  `);
-  
-  return stmt.all() as Project[];
-}
-
-export function getProjectById(id: string): Project | null {
-  const db = getDb();
-  const stmt = db.prepare(`
-    SELECT * FROM projects WHERE id = ?
-  `);
-  
-  return (stmt.get(id) as Project) || null;
-}
-
-export function deleteProject(id: string): boolean {
-  const db = getDb();
-  const stmt = db.prepare(`
-    DELETE FROM projects WHERE id = ?
-  `);
-  
+export async function getAllProjects(): Promise<Project[]> {
   try {
-    stmt.run(id);
+    const result = await sql<Project>`
+      SELECT * FROM projects ORDER BY created_at DESC
+    `;
+    return result.rows;
+  } catch (error) {
+    console.error("Error getting all projects:", error);
+    return [];
+  }
+}
+
+export async function getProjectById(id: string): Promise<Project | null> {
+  try {
+    const result = await sql<Project>`
+      SELECT * FROM projects WHERE id = ${id}
+    `;
+    return result.rows[0] || null;
+  } catch (error) {
+    console.error("Error getting project by id:", error);
+    return null;
+  }
+}
+
+export async function deleteProject(id: string): Promise<boolean> {
+  try {
+    await sql`
+      DELETE FROM projects WHERE id = ${id}
+    `;
     return true;
   } catch (error) {
     console.error("Error deleting project:", error);
@@ -108,22 +85,36 @@ export function deleteProject(id: string): boolean {
   }
 }
 
-export function updateProject(id: string, updates: Partial<Project>): boolean {
-  const db = getDb();
-  const allowedFields = ["name", "description", "wallet", "link", "volume", "txs"];
-  const fields = Object.keys(updates).filter(key => allowedFields.includes(key));
-  
-  if (fields.length === 0) return true;
-
-  const setClause = fields.map(field => `${field} = ?`).join(", ");
-  const values = fields.map(field => (updates as any)[field]);
-  
-  const stmt = db.prepare(`
-    UPDATE projects SET ${setClause}, updated_at = CURRENT_TIMESTAMP WHERE id = ?
-  `);
-  
+export async function updateProject(
+  id: string,
+  updates: Partial<Project>
+): Promise<boolean> {
   try {
-    stmt.run(...values, id);
+    const allowedFields = ["name", "description", "wallet", "link", "volume", "txs"];
+    const fields = Object.keys(updates).filter((key) =>
+      allowedFields.includes(key)
+    );
+
+    if (fields.length === 0) return true;
+
+    // 构建动态SQL UPDATE语句
+    const setClauses: string[] = [];
+    const values: any[] = [];
+
+    for (const field of fields) {
+      setClauses.push(`${field} = $${values.length + 1}`);
+      values.push((updates as any)[field]);
+    }
+
+    values.push(id);
+
+    const query = `
+      UPDATE projects 
+      SET ${setClauses.join(", ")}, updated_at = CURRENT_TIMESTAMP 
+      WHERE id = $${values.length}
+    `;
+
+    await sql.query(query, values);
     return true;
   } catch (error) {
     console.error("Error updating project:", error);
