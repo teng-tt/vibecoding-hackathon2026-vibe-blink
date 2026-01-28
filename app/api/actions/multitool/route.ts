@@ -24,6 +24,7 @@ function getParams(reqUrl: string) {
   const name = url.searchParams.get("name") || "未命名项目";
   const desc = url.searchParams.get("desc") || "Vibe Coding Project";
   const wallet = url.searchParams.get("wallet") || "你的默认钱包地址(回退)"; 
+  const baseUrl = url.origin;
   
   // 构建一个查询字符串，用于附加到所有后续链接中，保持状态
   const queryStr = `&name=${encodeURIComponent(name)}&desc=${encodeURIComponent(desc)}&wallet=${encodeURIComponent(wallet)}`;
