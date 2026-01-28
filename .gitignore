@@ -20,6 +20,13 @@
 # production
 /build
 
+# database
+/data
+*.db
+*.db-shm
+*.db-wal
+/build
+
 # misc
 .DS_Store
 *.pem
