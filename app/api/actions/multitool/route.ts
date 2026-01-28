@@ -31,7 +31,7 @@ function getParams(reqUrl: string) {
   return { url, name, desc, wallet, queryStr, baseUrl: url.origin };
 }
 
-function getMetadata(mode: string, reqUrl: string): ActionGetResponse {
+function getMetadata(mode: string, reqUrl: string) {
   const { name, desc, queryStr, baseUrl } = getParams(reqUrl);
   const baseApi = `${baseUrl}/api/actions/multitool`;
   
@@ -41,6 +41,7 @@ function getMetadata(mode: string, reqUrl: string): ActionGetResponse {
   // 1. 评分模式
   if (mode === "rate") {
     return {
+      type: "action" as const,
       icon: dynamicImage,
       title: `🌟 评价: ${name}`,
       description: desc,
@@ -48,9 +49,9 @@ function getMetadata(mode: string, reqUrl: string): ActionGetResponse {
       links: {
         actions: [
           // 注意：我们在 href 后面加上了 queryStr，确保参数传递下去
-          { type: "action", label: "1分", href: `${baseApi}?action=tx_rate&score=1${queryStr}` },
-          { type: "action", label: "5分", href: `${baseApi}?action=tx_rate&score=5${queryStr}` },
-          { type: "action", label: "🔙 返回", href: `${baseApi}?action=nav_menu${queryStr}` },
+          { type: "post" as const, label: "1分", href: `${baseApi}?action=tx_rate&score=1${queryStr}` },
+          { type: "post" as const, label: "5分", href: `${baseApi}?action=tx_rate&score=5${queryStr}` },
+          { type: "post" as const, label: "🔙 返回", href: `${baseApi}?action=nav_menu${queryStr}` },
         ],
       },
     };
@@ -59,6 +60,7 @@ function getMetadata(mode: string, reqUrl: string): ActionGetResponse {
   // 2. 打赏模式
   if (mode === "tip") {
     return {
+      type: "action" as const,
       icon: dynamicImage,
       title: `💰 打赏给: ${name}`,
       description: `支持一下 ${name} 的开发者 (Devnet)`,
@@ -66,12 +68,12 @@ function getMetadata(mode: string, reqUrl: string): ActionGetResponse {
       links: {
         actions: [
           {
-            type: "action",
+            type: "post" as const,
             label: "确认打赏",
             href: `${baseApi}?action=tx_tip&amount={amount}${queryStr}`,
             parameters: [{ name: "amount", label: "输入金额", required: true }],
           },
-          { type: "action", label: "🔙 返回", href: `${baseApi}?action=nav_menu${queryStr}` },
+          { type: "post" as const, label: "🔙 返回", href: `${baseApi}?action=nav_menu${queryStr}` },
         ],
       },
     };
@@ -80,15 +82,16 @@ function getMetadata(mode: string, reqUrl: string): ActionGetResponse {
   // 3. 预测模式
   if (mode === "predict") {
     return {
+      type: "action" as const,
       icon: dynamicImage,
       title: `🎲 预测: ${name}`,
       description: `你觉得 ${name} 会赢吗？`,
       label: "Predict",
       links: {
         actions: [
-          { type: "action", label: "看涨 (Yes)", href: `${baseApi}?action=tx_predict&side=yes${queryStr}` },
-          { type: "action", label: "看跌 (No)", href: `${baseApi}?action=tx_predict&side=no${queryStr}` },
-          { type: "action", label: "🔙 返回", href: `${baseApi}?action=nav_menu${queryStr}` },
+          { type: "post" as const, label: "看涨 (Yes)", href: `${baseApi}?action=tx_predict&side=yes${queryStr}` },
+          { type: "post" as const, label: "看跌 (No)", href: `${baseApi}?action=tx_predict&side=no${queryStr}` },
+          { type: "post" as const, label: "🔙 返回", href: `${baseApi}?action=nav_menu${queryStr}` },
         ],
       },
     };
@@ -96,15 +99,16 @@ function getMetadata(mode: string, reqUrl: string): ActionGetResponse {
 
   // 0. 主菜单
   return {
+    type: "action" as const,
     icon: dynamicImage,
     title: `⚡️ ${name}`, // 标题动态化
     description: desc,   // 描述动态化
     label: "Menu",
     links: {
       actions: [
-        { type: "action", label: "🌟 评分", href: `${baseApi}?action=nav_rate${queryStr}` },
-        { type: "action", label: "💰 打赏", href: `${baseApi}?action=nav_tip${queryStr}` },
-        { type: "action", label: "🎲 预测", href: `${baseApi}?action=nav_predict${queryStr}` },
+        { type: "post" as const, label: "🌟 评分", href: `${baseApi}?action=nav_rate${queryStr}` },
+        { type: "post" as const, label: "💰 打赏", href: `${baseApi}?action=nav_tip${queryStr}` },
+        { type: "post" as const, label: "🎲 预测", href: `${baseApi}?action=nav_predict${queryStr}` },
       ],
     },
   };
@@ -204,6 +208,7 @@ export const POST = async (req: Request) => {
 
     const payload: ActionPostResponse = await createPostResponse({
       fields: {
+        type: "transaction",
         transaction,
         message: message,
         links: {
