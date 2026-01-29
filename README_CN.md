@@ -115,7 +115,7 @@
 
 #### 1. 克隆仓库
 ```bash
-git clone https://github.com/yourusername/vibe-blink
+git clone https://github.com/teng-tt/vibecoding-hackathon2026-vibe-blink
 cd vibe-blink
 ```
 

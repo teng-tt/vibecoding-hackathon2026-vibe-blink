@@ -7,7 +7,7 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
-**[简体中文文档](./README_CN.md)** | **English** | **[Vibe Blink Factory Demo](https://vibecoding-hackathon2026-vibe-blink-hp8y6yxxb-tengtts-projects.vercel.app//)**
+**[简体中文文档](./README_CN.md)** | **English** | **[Vibe Blink Factory Demo](https://vibecoding-hackathon2026-vibe-blink.vercel.app/)**
 
 ---
 
@@ -56,7 +56,7 @@
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/yourusername/vibe-blink
+git clone https://github.com/teng-tt/vibecoding-hackathon2026-vibe-blink
 cd vibe-blink
 
 # 2. Install dependencies
@@ -240,7 +240,7 @@ MIT License - see [LICENSE](LICENSE) file for details
 
 - 🐦 Twitter: [@YourHandle](https://x.com/ttt81082918)
 - 💻 GitHub: [YourRepo](https://github.com/teng-tt/vibecoding-hackathon2026-vibe-blink)
-- 🔗 Live Demo: [https://vibecoding-hackathon2026-vibe-blink-hp8y6yxxb-tengtts-projects.vercel.app/](https://vibecoding-hackathon2026-vibe-blink-hp8y6yxxb-tengtts-projects.vercel.app/)
+- 🔗 Live Demo: [https://vibecoding-hackathon2026-vibe-blink.vercel.app//](https://vibecoding-hackathon2026-vibe-blink.vercel.app//)
 
 ---
 
