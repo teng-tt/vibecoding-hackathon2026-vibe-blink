@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { addProject, getAllProjects, getProjectById, deleteProject, updateProject, Project } from "@/lib/db";
+import { addProject, getAllProjects, getProjectById, deleteProject, updateProject, Project, initializeDatabase } from "@/lib/db";
 
 export async function GET(request: NextRequest) {
   try {
+    // 确保数据库表已初始化
+    await initializeDatabase();
+    
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 
@@ -20,12 +23,22 @@ export async function GET(request: NextRequest) {
     }
   } catch (error) {
     console.error("Error in GET /api/projects:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json(
+      { 
+        error: "Internal server error", 
+        details: errorMessage
+      }, 
+      { status: 500 }
+    );
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
+    // 确保数据库表已初始化
+    await initializeDatabase();
+    
     const body = await request.json();
     
     const project: Project = {
@@ -38,19 +51,34 @@ export async function POST(request: NextRequest) {
       txs: parseInt(body.txs) || 0,
     };
 
-    if (await addProject(project)) {
+    const result = await addProject(project);
+    if (result) {
       return NextResponse.json(project, { status: 201 });
     } else {
-      return NextResponse.json({ error: "Failed to add project" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Failed to add project", details: "Database operation failed" },
+        { status: 400 }
+      );
     }
   } catch (error) {
     console.error("Error in POST /api/projects:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json(
+      { 
+        error: "Internal server error", 
+        details: errorMessage,
+        hint: "Please ensure POSTGRES_URL or POSTGRES_URL_NON_POOLING is set in environment variables"
+      },
+      { status: 500 }
+    );
   }
 }
 
 export async function PUT(request: NextRequest) {
   try {
+    // 确保数据库表已初始化
+    await initializeDatabase();
+    
     const body = await request.json();
     const { id, ...updates } = body;
 
@@ -66,12 +94,22 @@ export async function PUT(request: NextRequest) {
     }
   } catch (error) {
     console.error("Error in PUT /api/projects:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json(
+      { 
+        error: "Internal server error", 
+        details: errorMessage
+      },
+      { status: 500 }
+    );
   }
 }
 
 export async function DELETE(request: NextRequest) {
   try {
+    // 确保数据库表已初始化
+    await initializeDatabase();
+    
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 
@@ -86,7 +124,14 @@ export async function DELETE(request: NextRequest) {
     }
   } catch (error) {
     console.error("Error in DELETE /api/projects:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json(
+      { 
+        error: "Internal server error", 
+        details: errorMessage
+      },
+      { status: 500 }
+    );
   }
 }
 

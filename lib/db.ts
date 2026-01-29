@@ -38,13 +38,23 @@ export async function initializeDatabase() {
 
 export async function addProject(project: Project): Promise<boolean> {
   try {
+    // 确保环境变量存在
+    if (!process.env.POSTGRES_URL && !process.env.POSTGRES_URL_NON_POOLING) {
+      console.error("Database connection error: POSTGRES_URL not configured");
+      return false;
+    }
+
     await sql`
       INSERT INTO projects (id, name, description, wallet, link, volume, txs)
       VALUES (${project.id}, ${project.name}, ${project.description}, ${project.wallet}, ${project.link}, ${project.volume}, ${project.txs})
     `;
+    console.log(`Project added successfully: ${project.id}`);
     return true;
   } catch (error) {
     console.error("Error adding project:", error);
+    if (error instanceof Error) {
+      console.error("Error details:", error.message);
+    }
     return false;
   }
 }

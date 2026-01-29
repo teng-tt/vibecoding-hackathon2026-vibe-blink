@@ -12,9 +12,11 @@ export default function CreateProject() {
   });
   const [generatedLink, setGeneratedLink] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleGenerate = async () => {
     setIsLoading(true);
+    setErrorMessage("");
     try {
       // 获取当前网站的基础域名
       const baseUrl = window.location.origin;
@@ -48,13 +50,17 @@ export default function CreateProject() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to save project");
+        const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
+        const errorMsg = errorData.details || errorData.error || "Failed to save project";
+        throw new Error(errorMsg);
       }
 
       setGeneratedLink(finalLink);
+      setErrorMessage("");
     } catch (error) {
       console.error("Error generating project:", error);
-      alert("生成项目失败，请重试");
+      const msg = error instanceof Error ? error.message : "生成项目失败，请重试";
+      setErrorMessage(msg);
     } finally {
       setIsLoading(false);
     }
@@ -108,6 +114,18 @@ export default function CreateProject() {
             {isLoading ? "生成中..." : t.create.generateBtn}
           </button>
         </div>
+
+        {errorMessage && (
+          <div className="mt-6 p-4 rounded border" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', borderColor: '#ef4444', borderWidth: '1px' }}>
+            <h3 className="font-bold mb-2" style={{ color: '#ef4444' }}>❌ 错误</h3>
+            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+              {errorMessage}
+            </p>
+            <p className="text-xs mt-2" style={{ color: 'var(--text-muted)' }}>
+              💡 提示：请确保在 Vercel 环境变量中已设置 POSTGRES_URL 或 POSTGRES_URL_NON_POOLING
+            </p>
+          </div>
+        )}
 
         {generatedLink && (
           <div className="mt-8 p-4 rounded border" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', borderColor: 'var(--success-color)', borderWidth: '1px' }}>

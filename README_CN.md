@@ -510,7 +510,7 @@ http://localhost:3000
 
 ## 🚀 部署
 
-### 部署到 Vercel
+### 部署到 Vercel（推荐）
 
 这是推荐的部署方式（内置 Postgres 支持）：
 
@@ -532,6 +532,8 @@ POSTGRES_URL=postgresql://user:password@host:5432/database
 POSTGRES_URL_NON_POOLING=postgresql://user:password@host:5432/database
 ```
 
+**⚠️ 重要**: 同时设置 `POSTGRES_URL` 和 `POSTGRES_URL_NON_POOLING` 两个变量！
+
 #### 4. 部署
 ```bash
 # Vercel 会自动部署你的主分支
@@ -545,6 +547,38 @@ POSTGRES_URL_NON_POOLING=postgresql://user:password@host:5432/database
 - Render
 - Fly.io
 - 自托管服务器
+
+---
+
+## 🐛 部署常见问题
+
+### ❌ Error: Failed to save project
+
+**原因**: 数据库连接失败或环境变量未设置
+
+**解决方案**:
+
+1. 确保在 Vercel Dashboard 中同时设置了：
+   - `POSTGRES_URL`
+   - `POSTGRES_URL_NON_POOLING`
+
+2. 检查连接字符串格式是否正确：
+   ```
+   postgresql://user:password@host:5432/database
+   ```
+
+3. 查看 Vercel 部署日志：
+   ```bash
+   vercel logs [project-name] --follow
+   ```
+
+4. 强制重新部署：
+   ```bash
+   git commit --allow-empty -m "Force redeploy"
+   git push origin main
+   ```
+
+**详细故障排查**: 见 [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)
 
 ---
 
