@@ -90,12 +90,19 @@ export async function initializeDatabase() {
       console.error("❌ Error initializing database:", error);
       if (error instanceof Error) {
         console.error("Details:", error.message);
-        // 如果是连接错误（环境变量未设置），提示用户
-        if (error.message.includes("ECONNREFUSED") || 
-            error.message.includes("cannot find") ||
-            error.message.includes("not found") ||
-            error.message.includes("POSTGRES_URL")) {
-          console.warn("⚠️  Database configuration issue - Please verify POSTGRES_URL in environment variables");
+        
+        // 针对不同的错误类型提供明确的诊断信息
+        if (error.message.includes("invalid_connection_string")) {
+          console.error("⚠️ CRITICAL: Connection string configuration error!");
+          console.error("   In Vercel Dashboard > Settings > Environment Variables, ensure you have BOTH:");
+          console.error("   1. POSTGRES_URL (pooled connection)");
+          console.error("   2. POSTGRES_URL_NON_POOLING (direct connection)");
+          console.error("   Copy these from your Vercel Postgres database dashboard.");
+        } else if (error.message.includes("missing_connection_string") ||
+                   error.message.includes("ECONNREFUSED") || 
+                   error.message.includes("cannot find") ||
+                   error.message.includes("not found")) {
+          console.error("⚠️  Database connection failed - Please verify environment variables are properly configured");
         }
       }
       throw error;
