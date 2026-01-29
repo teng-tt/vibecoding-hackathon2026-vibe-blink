@@ -7,7 +7,7 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
-**[简体中文文档](./README_CN.md)** | **English** | **[Vibe Blink Factory Demo](https://vibe-blink.vercel.app/)**
+**[简体中文文档](./README_CN.md)** | **English** | **[Vibe Blink Factory Demo](https://vibecoding-hackathon2026-vibe-blink-hp8y6yxxb-tengtts-projects.vercel.app//)**
 
 ---
 
