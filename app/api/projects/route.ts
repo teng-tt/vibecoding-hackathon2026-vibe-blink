@@ -3,12 +3,6 @@ import { addProject, getAllProjects, getProjectById, deleteProject, updateProjec
 
 export async function GET(request: NextRequest) {
   try {
-        console.log("DB_URL是否存在1:", !!process.env.POSTGRES_URL); 
-        console.log("DB_URL是否存在2:", !!process.env.POSTGRES_URL_NON_POOLING); 
-        console.log("DB_URL是否存在1:", process.env.POSTGRES_URL); 
-        console.log("DB_URL是否存在2:", process.env.POSTGRES_URL_NON_POOLING); 
-         console.log("Server Side Check1:", process.env.POSTGRES_URL ? "Has Value" : "No Value");
-          console.log("Server Side Check2:", process.env.POSTGRES_URL_NON_POOLING ? "Has Value" : "No Value");
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 
@@ -39,6 +33,12 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+            console.log("DB_URL是否存在1:", !!process.env.POSTGRES_URL); 
+        console.log("DB_URL是否存在2:", !!process.env.POSTGRES_URL_NON_POOLING); 
+        console.log("DB_URL是否存在1:", process.env.POSTGRES_URL); 
+        console.log("DB_URL是否存在2:", process.env.POSTGRES_URL_NON_POOLING); 
+         console.log("Server Side Check1:", process.env.POSTGRES_URL ? "Has Value" : "No Value");
+          console.log("Server Side Check2:", process.env.POSTGRES_URL_NON_POOLING ? "Has Value" : "No Value");
     const body = await request.json();
     
     const project: Project = {
