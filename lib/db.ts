@@ -12,28 +12,59 @@ export interface Project {
   updated_at?: string;
 }
 
-// 初始化数据库表
+// 全局初始化标志 - 仅在程序启动时初始化一次
+let isInitialized = false;
+let initializationPromise: Promise<void> | null = null;
+
+// 初始化数据库表（仅执行一次）
 export async function initializeDatabase() {
-  try {
-    // 创建项目表（如果不存在）
-    await sql`
-      CREATE TABLE IF NOT EXISTS projects (
-        id TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
-        description TEXT,
-        wallet TEXT,
-        link TEXT,
-        volume NUMERIC,
-        txs INTEGER,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `;
-    console.log("Database initialized successfully");
-  } catch (error) {
-    console.error("Error initializing database:", error);
-    throw error;
+  // 如果已初始化，直接返回
+  if (isInitialized) {
+    return;
   }
+
+  // 如果正在初始化，等待完成
+  if (initializationPromise) {
+    return initializationPromise;
+  }
+
+  // 开始初始化
+  initializationPromise = (async () => {
+    try {
+      // 验证环境变量
+      if (!process.env.POSTGRES_URL && !process.env.POSTGRES_URL_NON_POOLING) {
+        console.warn("Database: POSTGRES_URL not configured, skipping initialization");
+        return;
+      }
+
+      // 创建项目表（如果不存在）
+      await sql`
+        CREATE TABLE IF NOT EXISTS projects (
+          id TEXT PRIMARY KEY,
+          name TEXT NOT NULL,
+          description TEXT,
+          wallet TEXT,
+          link TEXT,
+          volume NUMERIC,
+          txs INTEGER,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `;
+      console.log("✅ Database initialized successfully");
+      isInitialized = true;
+    } catch (error) {
+      console.error("❌ Error initializing database:", error);
+      if (error instanceof Error) {
+        console.error("Details:", error.message);
+      }
+      throw error;
+    } finally {
+      initializationPromise = null;
+    }
+  })();
+
+  return initializationPromise;
 }
 
 export async function addProject(project: Project): Promise<boolean> {

@@ -1,10 +1,25 @@
 "use client";
 
+import { useEffect } from "react";
 import Sidebar from "./Sidebar";
 import { I18nProvider } from "@/lib/i18nContext";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { initializeDatabase } from "@/lib/db";
 
 export default function RootLayoutClient({ children }: { children: React.ReactNode }) {
+  // 在客户端挂载时初始化数据库
+  useEffect(() => {
+    // 仅在浏览器中执行一次
+    const initDB = async () => {
+      try {
+        await initializeDatabase();
+      } catch (error) {
+        console.error("Database initialization error:", error);
+      }
+    };
+    initDB();
+  }, []); // 仅在组件挂载时执行一次
+
   return (
     <I18nProvider>
       <div className="flex min-h-screen">
