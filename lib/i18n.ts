@@ -15,7 +15,7 @@ export const translations = {
     // 侧边栏
     sidebar: {
       title: "VibeBlink",
-      subtitle: "Solana Hackathon 2025",
+      subtitle: "Solana Hackathon 2026",
     },
 
     // Header
@@ -97,7 +97,7 @@ export const translations = {
     // 侧边栏
     sidebar: {
       title: "VibeBlink",
-      subtitle: "Solana 黑客松 2025",
+      subtitle: "Solana 黑客松 2026",
     },
 
     // Header

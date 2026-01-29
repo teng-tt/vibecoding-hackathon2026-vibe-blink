@@ -40,7 +40,7 @@
 
 - **Track**: Consumer & Entertainment / Alpha Tools
 - **Network**: Solana Devnet (please switch wallet for testing)
-- **Event**: 2025 Solana Hackathon Official Entry
+- **Event**: 2026 Solana Vibe Coding Hackathon Official Entry
 
 ---
 
@@ -231,7 +231,7 @@ MIT License - see [LICENSE](LICENSE) file for details
 - **Solana Labs** — For Solana Actions standard and ecosystem
 - **Vercel** — For Next.js and database services
 - **Dialect** — For Actions execution engine
-- **2025 Solana Hackathon** — Official event support
+- **2026 Solana Vibe Coding Hackathon** — Official event support
 - **Solana Community** — For continuous support
 
 ---

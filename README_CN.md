@@ -38,7 +38,7 @@
 
 - **赛道**: Consumer & Entertainment / Alpha Tools
 - **网络**: Solana Devnet（请切换钱包测试）
-- **2025 Solana Hackathon** 官方参赛项目
+- **2026 Solana Vibe Coding Hackathon** 官方参赛项目
 
 ---
 
@@ -642,7 +642,7 @@ MIT License - 详见 [LICENSE](LICENSE) 文件
 - 🎯 **Solana Labs** — 提供 Solana Actions 标准和生态
 - 🚀 **Vercel** — 提供 Next.js 框架和数据库服务
 - 💬 **Dialect** — 提供 Actions 执行引擎
-- 🏆 **2025 Solana Hackathon** — 官方赛事支持
+- 🏆 **2026 Solana Vibe Coding Hackathon** — 官方赛事支持
 - 🌍 **Solana 中文社区** — 社区支持和反馈
 
 特别感谢：
