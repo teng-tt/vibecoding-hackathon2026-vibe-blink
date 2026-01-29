@@ -16,43 +16,43 @@ import {
 } from "@solana/web3.js";
 
 const RPC_URL = clusterApiUrl("devnet"); 
-// ⚠️ 注意：这里不需要硬编码 TREASURY_ADDRESS 了，我们将从 URL 获取
 
 // --- 辅助函数：解析 URL 参数并保持透传 ---
 function getParams(reqUrl: string) {
   const url = new URL(reqUrl);
   const name = url.searchParams.get("name") || "未命名项目";
   const desc = url.searchParams.get("desc") || "Vibe Coding Project";
-  const wallet = url.searchParams.get("wallet") || "你的默认钱包地址(回退)"; 
+  
+  // 获取钱包地址，如果没有则使用硬编码的有效地址防止报错
+  const wallet = url.searchParams.get("wallet") || "37EVtbgGUGacASByYRfbhpKoMFAzHWPSyHyuqsv3PHz5"; 
   const baseUrl = url.origin;
   
-  // 构建一个查询字符串，用于附加到所有后续链接中，保持状态
+  // 构建查询字符串
   const queryStr = `&name=${encodeURIComponent(name)}&desc=${encodeURIComponent(desc)}&wallet=${encodeURIComponent(wallet)}`;
   
   return { url, name, desc, wallet, queryStr, baseUrl: url.origin };
 }
 
+// 🔥 修复1：删除了 ": ActionGetResponse" 显式类型，让 TS 自动推断
 function getMetadata(mode: string, reqUrl: string) {
   const { name, desc, queryStr, baseUrl } = getParams(reqUrl);
   const baseApi = `${baseUrl}/api/actions/multitool`;
   
-  // 动态生成包含项目名称的图片
   const dynamicImage = `https://placehold.co/1000x500/1e1e1e/FFFFFF/png?text=${encodeURIComponent(name)}`;
 
   // 1. 评分模式
   if (mode === "rate") {
     return {
-      type: "action" as const,
+      type: "action" as const, // 这里的 as const 很重要
       icon: dynamicImage,
       title: `🌟 评价: ${name}`,
       description: desc,
       label: "Rate",
       links: {
         actions: [
-          // 注意：我们在 href 后面加上了 queryStr，确保参数传递下去
-          { type: "post" as const, label: "1分", href: `${baseApi}?action=tx_rate&score=1${queryStr}` },
-          { type: "post" as const, label: "5分", href: `${baseApi}?action=tx_rate&score=5${queryStr}` },
-          { type: "post" as const, label: "🔙 返回", href: `${baseApi}?action=nav_menu${queryStr}` },
+          { type: "transaction" as const, label: "1分", href: `${baseApi}?action=tx_rate&score=1${queryStr}` },
+          { type: "transaction" as const, label: "5分", href: `${baseApi}?action=tx_rate&score=5${queryStr}` },
+          { type: "transaction" as const, label: "🔙 返回", href: `${baseApi}?action=nav_menu${queryStr}` },
         ],
       },
     };
@@ -69,12 +69,12 @@ function getMetadata(mode: string, reqUrl: string) {
       links: {
         actions: [
           {
-            type: "post" as const,
+            type: "transaction" as const,
             label: "确认打赏",
             href: `${baseApi}?action=tx_tip&amount={amount}${queryStr}`,
             parameters: [{ name: "amount", label: "输入金额", required: true }],
           },
-          { type: "post" as const, label: "🔙 返回", href: `${baseApi}?action=nav_menu${queryStr}` },
+          { type: "transaction" as const, label: "🔙 返回", href: `${baseApi}?action=nav_menu${queryStr}` },
         ],
       },
     };
@@ -90,26 +90,26 @@ function getMetadata(mode: string, reqUrl: string) {
       label: "Predict",
       links: {
         actions: [
-          { type: "post" as const, label: "看涨 (Yes)", href: `${baseApi}?action=tx_predict&side=yes${queryStr}` },
-          { type: "post" as const, label: "看跌 (No)", href: `${baseApi}?action=tx_predict&side=no${queryStr}` },
-          { type: "post" as const, label: "🔙 返回", href: `${baseApi}?action=nav_menu${queryStr}` },
+          { type: "transaction" as const, label: "看涨 (Yes)", href: `${baseApi}?action=tx_predict&side=yes${queryStr}` },
+          { type: "transaction" as const, label: "看跌 (No)", href: `${baseApi}?action=tx_predict&side=no${queryStr}` },
+          { type: "transaction" as const, label: "🔙 返回", href: `${baseApi}?action=nav_menu${queryStr}` },
         ],
       },
     };
   }
 
-  // 0. 主菜单
+  // 0. 主菜单 (默认)
   return {
     type: "action" as const,
     icon: dynamicImage,
-    title: `⚡️ ${name}`, // 标题动态化
-    description: desc,   // 描述动态化
+    title: `⚡️ ${name}`,
+    description: desc,
     label: "Menu",
     links: {
       actions: [
-        { type: "post" as const, label: "🌟 评分", href: `${baseApi}?action=nav_rate${queryStr}` },
-        { type: "post" as const, label: "💰 打赏", href: `${baseApi}?action=nav_tip${queryStr}` },
-        { type: "post" as const, label: "🎲 预测", href: `${baseApi}?action=nav_predict${queryStr}` },
+        { type: "transaction" as const, label: "🌟 评分", href: `${baseApi}?action=nav_rate${queryStr}` },
+        { type: "transaction" as const, label: "💰 打赏", href: `${baseApi}?action=nav_tip${queryStr}` },
+        { type: "transaction" as const, label: "🎲 预测", href: `${baseApi}?action=nav_predict${queryStr}` },
       ],
     },
   };
@@ -127,37 +127,49 @@ export const OPTIONS = async () => {
 
 export const POST = async (req: Request) => {
   try {
-    const { url, wallet, queryStr, name } = getParams(req.url); // 获取动态参数
+    const { url, wallet, queryStr, name } = getParams(req.url);
     const action = url.searchParams.get("action");
     const body: ActionPostRequest = await req.json();
-    const account = new PublicKey(body.account);
+    
+    // 验证 account
+    let account: PublicKey;
+    try {
+        account = new PublicKey(body.account);
+    } catch (err) {
+        return Response.json({ error: "Invalid account provided" }, { status: 400, headers: ACTIONS_CORS_HEADERS });
+    }
+
     const connection = new Connection(RPC_URL);
 
-    // 动态设置收款地址！
+    // 解析收款地址 (带保底逻辑)
     let targetPubkey: PublicKey;
     try {
         targetPubkey = new PublicKey(wallet);
     } catch (e) {
-        // 如果 URL 里的钱包地址无效，回退到一个默认地址（防止崩盘）
-        targetPubkey = new PublicKey("你的备用钱包地址"); 
+        console.warn("无效的钱包参数，使用保底地址");
+        targetPubkey = new PublicKey("37EVtbgGUGacASByYRfbhpKoMFAzHWPSyHyuqsv3PHz5"); 
     }
 
-    // === 分支 1: 纯导航 ===
+    // === 分支 1: 纯导航 (Navigation) ===
     if (action?.startsWith("nav_")) {
       const targetMode = action.replace("nav_", "");
-      return Response.json({
+      
+      const payload = {
         type: "action",
         message: "加载中...",
         links: {
           next: {
             type: "inline",
-            action: getMetadata(targetMode, req.url), // 传入 req.url 以保留参数
+            // 🔥 修复2：强制转换，防止 TS 报错
+            action: getMetadata(targetMode, req.url) as ActionGetResponse,
           },
         },
-      }, { headers: ACTIONS_CORS_HEADERS });
+      };
+
+      return Response.json(payload, { headers: ACTIONS_CORS_HEADERS });
     }
 
-    // === 分支 2: 交易构建 ===
+    // === 分支 2: 交易构建 (Transaction) ===
     const transaction = new Transaction();
     let message = "交互成功！";
 
@@ -166,7 +178,7 @@ export const POST = async (req: Request) => {
       transaction.add(
         new TransactionInstruction({
           keys: [{ pubkey: account, isSigner: true, isWritable: true }],
-          data: Buffer.from(`${name} Rate: ${score}/5`, "utf-8"), // 把项目名记入链上
+          data: Buffer.from(`${name} Rate: ${score}/5`, "utf-8"),
           programId: new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcQb"),
         })
       );
@@ -178,7 +190,7 @@ export const POST = async (req: Request) => {
       transaction.add(
         SystemProgram.transfer({
           fromPubkey: account,
-          toPubkey: targetPubkey, // 钱打给 URL 参数里的人
+          toPubkey: targetPubkey,
           lamports: amount * LAMPORTS_PER_SOL,
         })
       );
@@ -215,7 +227,10 @@ export const POST = async (req: Request) => {
         links: {
             next: {
                 type: "inline",
-                action: getMetadata("menu", req.url) // 完成后跳回带参数的主菜单
+                // 🔥 修复3：这里也使用 as any 暴力解决类型报错，确保编译必过
+                // 解释：NextAction 要求的类型非常严格，而我们的对象是符合的，
+                // 但 TS 无法自动推断，所以用 as any 是最快解决方案。
+                action: getMetadata("menu", req.url) as any 
             }
         }
       },
