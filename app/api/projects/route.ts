@@ -3,6 +3,9 @@ import { addProject, getAllProjects, getProjectById, deleteProject, updateProjec
 
 export async function GET(request: NextRequest) {
   try {
+    // 确保数据库已初始化
+    await initializeDatabase();
+    
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 
@@ -33,6 +36,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // 确保数据库已初始化
+    await initializeDatabase();
+    
     const body = await request.json();
     
     const project: Project = {
@@ -67,7 +73,10 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
+// 确保数据库已初始化
+    await initializeDatabase();
+    
+    
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
@@ -95,7 +104,10 @@ export async function PUT(request: NextRequest) {
     );
   }
 }
-
+// 确保数据库已初始化
+    await initializeDatabase();
+    
+    
 export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);

@@ -46,6 +46,20 @@ export async function initializeDatabase() {
   // 开始初始化
   initializationPromise = (async () => {
     try {
+      // 检查是否运行在服务器环境
+      if (typeof window !== 'undefined') {
+        console.warn("⚠️ Database initialization called from client-side, skipping");
+        isInitialized = true;
+        return;
+      }
+
+      // 检查环境变量
+      if (!process.env.POSTGRES_URL) {
+        console.warn("⚠️ POSTGRES_URL environment variable not configured, skipping initialization");
+        isInitialized = true;
+        return;
+      }
+
       // 尝试检查表是否存在（这会验证数据库连接）
       const exists = await tableExists();
       
