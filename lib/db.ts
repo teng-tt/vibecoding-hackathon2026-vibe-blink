@@ -48,6 +48,8 @@ export async function initializeDatabase() {
     try {
       // 验证环境变量
       if (!process.env.POSTGRES_URL && !process.env.POSTGRES_URL_NON_POOLING) {
+        console.log("DB_URL是否存在1:", !!process.env.POSTGRES_URL); 
+        console.log("DB_URL是否存在2:", !!process.env.POSTGRES_URL_NON_POOLING); 
         console.warn("⚠️  Database: POSTGRES_URL not configured, skipping initialization");
         isInitialized = true;
         return;
@@ -95,8 +97,6 @@ export async function initializeDatabase() {
 export async function addProject(project: Project): Promise<boolean> {
   try {
     // 确保环境变量存在
-    console.log("DB_URL是否存在1:", !!process.env.POSTGRES_URL); 
-    console.log("DB_URL是否存在2:", !!process.env.POSTGRES_URL_NON_POOLING); 
     if (!process.env.POSTGRES_URL && !process.env.POSTGRES_URL_NON_POOLING) {
       console.error("Database connection error: POSTGRES_URL not configured");
       return false;
