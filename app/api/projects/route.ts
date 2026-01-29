@@ -70,8 +70,8 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    // 确保数据库表已初始化
-    await initializeDatabase();
+    const body = await request.json();
+    const { id, ...updates } = body;
     
     if (!id) {
       return NextResponse.json({ error: "Project ID is required" }, { status: 400 });
@@ -98,8 +98,8 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    // 确保数据库表已初始化
-    await initializeDatabase();
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
     
     if (!id) {
       return NextResponse.json({ error: "Project ID is required" }, { status: 400 });
