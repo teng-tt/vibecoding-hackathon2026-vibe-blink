@@ -16,7 +16,22 @@ export interface Project {
 let isInitialized = false;
 let initializationPromise: Promise<void> | null = null;
 
-// 初始化数据库表（仅执行一次）
+/**
+ * 检查数据库表是否已存在
+ */
+async function tableExists(): Promise<boolean> {
+  try {
+    await sql`SELECT 1 FROM projects LIMIT 1`;
+    return true;
+  } catch (error) {
+    // 表不存在会抛出错误
+    return false;
+  }
+}
+
+/**
+ * 初始化数据库表（仅执行一次，且仅在表不存在时创建）
+ */
 export async function initializeDatabase() {
   // 如果已初始化，直接返回
   if (isInitialized) {
@@ -33,7 +48,17 @@ export async function initializeDatabase() {
     try {
       // 验证环境变量
       if (!process.env.POSTGRES_URL && !process.env.POSTGRES_URL_NON_POOLING) {
-        console.warn("Database: POSTGRES_URL not configured, skipping initialization");
+        console.warn("⚠️  Database: POSTGRES_URL not configured, skipping initialization");
+        isInitialized = true;
+        return;
+      }
+
+      // 检查表是否已存在
+      const exists = await tableExists();
+      
+      if (exists) {
+        console.log("✅ Database table 'projects' already exists, skipping initialization");
+        isInitialized = true;
         return;
       }
 
@@ -51,7 +76,7 @@ export async function initializeDatabase() {
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
       `;
-      console.log("✅ Database initialized successfully");
+      console.log("✅ Database table 'projects' created successfully");
       isInitialized = true;
     } catch (error) {
       console.error("❌ Error initializing database:", error);
