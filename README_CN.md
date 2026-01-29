@@ -658,9 +658,9 @@ MIT License - 详见 [LICENSE](LICENSE) 文件
 
 有任何问题或建议？
 
-- 📝 GitHub Issues: [提交 Issue](https://github.com/yourrepo/issues)
-- 💌 Email: your-email@example.com
-- 🐦 Twitter: [@YourHandle](https://twitter.com/yourhandle)
+- 📝 GitHub Issues: [提交 Issue](https://github.com/teng-tt/vibecoding-hackathon2026-vibe-blink/issues)
+- 💌 Email: davidthx1@gmail.com
+- 🐦 Twitter: [@YourHandle](https://x.com/ttt81082918)
 
 ---
 
@@ -678,4 +678,4 @@ MIT License - 详见 [LICENSE](LICENSE) 文件
 
 **Made with ❤️ for the Solana ecosystem** 🚀
 
-⚡️ Vibe Coding Challenge 2025 | #Solana #VibeCoding #Blinks #BuildInPublic
+⚡️ Vibe Coding Challenge 2026 | #Solana #VibeCoding #Blinks #BuildInPublic
