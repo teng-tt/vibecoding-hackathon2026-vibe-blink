@@ -46,14 +46,7 @@ export async function initializeDatabase() {
   // 开始初始化
   initializationPromise = (async () => {
     try {
-      // 验证环境变量
-      if (!process.env.POSTGRES_URL && !process.env.POSTGRES_URL_NON_POOLING) {
-        console.warn("⚠️  Database: POSTGRES_URL not configured, skipping initialization");
-        isInitialized = true;
-        return;
-      }
-
-      // 检查表是否已存在
+      // 尝试检查表是否存在（这会验证数据库连接）
       const exists = await tableExists();
       
       if (exists) {
@@ -63,6 +56,7 @@ export async function initializeDatabase() {
       }
 
       // 创建项目表（如果不存在）
+      console.log("📝 Creating database table 'projects'...");
       await sql`
         CREATE TABLE IF NOT EXISTS projects (
           id TEXT PRIMARY KEY,
@@ -82,6 +76,13 @@ export async function initializeDatabase() {
       console.error("❌ Error initializing database:", error);
       if (error instanceof Error) {
         console.error("Details:", error.message);
+        // 如果是连接错误（环境变量未设置），提示用户
+        if (error.message.includes("ECONNREFUSED") || 
+            error.message.includes("cannot find") ||
+            error.message.includes("not found") ||
+            error.message.includes("POSTGRES_URL")) {
+          console.warn("⚠️  Database configuration issue - Please verify POSTGRES_URL in environment variables");
+        }
       }
       throw error;
     } finally {
@@ -94,20 +95,14 @@ export async function initializeDatabase() {
 
 export async function addProject(project: Project): Promise<boolean> {
   try {
-    // 确保环境变量存在
-    if (!process.env.POSTGRES_URL && !process.env.POSTGRES_URL_NON_POOLING) {
-      console.error("Database connection error: POSTGRES_URL not configured");
-      return false;
-    }
-
     await sql`
       INSERT INTO projects (id, name, description, wallet, link, volume, txs)
       VALUES (${project.id}, ${project.name}, ${project.description}, ${project.wallet}, ${project.link}, ${project.volume}, ${project.txs})
     `;
-    console.log(`Project added successfully: ${project.id}`);
+    console.log(`✅ Project added successfully: ${project.id}`);
     return true;
   } catch (error) {
-    console.error("Error adding project:", error);
+    console.error("❌ Error adding project:", error);
     if (error instanceof Error) {
       console.error("Error details:", error.message);
     }
