@@ -50,6 +50,8 @@ export async function initializeDatabase() {
       if (!process.env.POSTGRES_URL && !process.env.POSTGRES_URL_NON_POOLING) {
         console.log("DB_URL是否存在1:", !!process.env.POSTGRES_URL); 
         console.log("DB_URL是否存在2:", !!process.env.POSTGRES_URL_NON_POOLING); 
+        console.log("DB_URL是否存在1:", process.env.POSTGRES_URL); 
+        console.log("DB_URL是否存在2:", process.env.POSTGRES_URL_NON_POOLING); 
         console.warn("⚠️  Database: POSTGRES_URL not configured, skipping initialization");
         isInitialized = true;
         return;
